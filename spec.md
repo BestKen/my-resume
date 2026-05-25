@@ -73,15 +73,96 @@
 - Section 標題可對應 anchor id
 - 可加入簡單滑動動態（CSS 過渡、卡片 hover）
 
-## 待你確認項目
-- 是否同意使用「王小明 / 中原大學資管系」作為假資料範例
-- 是否要保持 `Email / GitHub / LinkedIn / IG` 連結 placeholder，或填入示範連結
-- 是否希望作品集卡片含「GitHub / Demo」按鈕（可選）
+## Apple Liquid Glass 設計規格（CSS Only 升級）
 
-## 交付內容
-- `index.html`（含內嵌 CSS / JS）
-- `spec.md`
+### 核心視覺要素
+
+#### 1. **背景漸層（Background Motion）**
+- 基礎背景色：深藍 `#0c1120`
+- 兩層 radial-gradient 漸層光暈：
+  - 第一層：深藍 `rgba(120, 202, 255, 0.18)` 左上漸出
+  - 第二層：紫粉 `rgba(135, 95, 255, 0.2)` 右下漸出
+- 頂層 linear-gradient：深藍漸層 `#09101f` → `#0b121f`
+- 動畫效果（可選）：使用 `@keyframes` 讓漸層光暈緩慢飄動（3-5s 循環）
+
+#### 2. **玻璃卡片（Glass Panel）**
+- 背景：半透明白底 `rgba(255, 255, 255, 0.08)` ～ `rgba(255, 255, 255, 0.12)`
+- 邊框：1px 半透明白邊 `rgba(255, 255, 255, 0.12)` ～ `rgba(255, 255, 255, 0.14)`
+- 模糊效果：`backdrop-filter: blur(24px)` （macOS Big Sur 標準值）
+- 圓角：`border-radius: 28px` ～ `32px`
+- 陰影：柔和多層 `box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25)` + inset 亮邊效果（可選）
+
+#### 3. **Hover 卡片浮起效果（Soft Glow Float）**
+- 基礎：向上平移 `transform: translateY(-4px)` ～ `translateY(-6px)`
+- 邊框發光：`border-color` 升高透明度至 `rgba(149, 214, 255, 0.28)` ～ `rgba(149, 214, 255, 0.32)`
+- 陰影增強：添加外部 glow `box-shadow: 0 0 24px rgba(120, 210, 255, 0.15)`（可疊加）
+- 過渡動畫：`transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease`
+
+#### 4. **Timeline 樣式**
+- **垂直軸**：左側 `border-left: 2px solid rgba(120, 210, 255, 0.2)` + **glow 效果** `box-shadow: inset 0 0 16px rgba(120, 210, 255, 0.1)`
+- **圓點節點**：
+  - 寬高：`12px × 12px`
+  - 背景：漸層 `linear-gradient(180deg, #7fd9ff, #5ab5ff)`
+  - 發光環：`box-shadow: 0 0 0 6px rgba(120, 210, 255, 0.12), 0 0 16px rgba(120, 210, 255, 0.08)`
+  - 位置：左側 18px 固定
+- **時間文字**：`var(--accent)` 色，`0.92rem` 字級，`letter-spacing: 0.08em`
+
+#### 5. **Tag 雲（Tag Cloud / Capsule）**
+- **外觀**：膠囊狀 `border-radius: 999px`
+- **背景**：半透明 `rgba(255, 255, 255, 0.08)` ～ `rgba(149, 214, 255, 0.12)`
+- **邊框**：1px 清楚可讀 `rgba(255, 255, 255, 0.12)` ～ `rgba(255, 255, 255, 0.14)`（控制透明度保持可讀性）
+- **Hover 效果**：輕微上升 `transform: translateY(-2px)` + 背景色提升
+- **字級**：`0.92rem` ～ `0.95rem`，顏色 `#f2f7ff` ～ `#eaffff`
+- **Gap**：`10px` flex 間距
+
+#### 6. **文字對比度（Accessibility）**
+- 主文字（h1, h2）：`#ffffff` 或 `var(--text)` `#f5f7fb`
+- 副文字：`var(--muted)` `#d9e0ff`
+- 標籤文字：`#eaf4ff` ～ `#eaffff`
+- 最小 WCAG AA 對比度要求：4.5:1
+
+### 色彩系統（色票）
+```
+--bg: #0c1120              // 深藍背景
+--panel: rgba(255, 255, 255, 0.12)    // 卡片基礎
+--panel-strong: rgba(255, 255, 255, 0.18)  // 卡片強調
+--border: rgba(255, 255, 255, 0.14)   // 邊框標準
+--text: #f5f7fb            // 主文字
+--muted: #d9e0ff           // 副文字
+--accent: #96d6ff          // 強調色（淡藍）
+--accent-strong: #75c6ff   // 強調色深
+--shadow: 0 30px 80px rgba(0, 0, 0, 0.25)  // 標準陰影
+```
+
+### 動畫規範
+- 標準過渡時間：`0.25s ease`
+- 背景動畫：✅ **不使用**（保持靜態漸層）
+- Easing Function：主要用 `ease` / `ease-in-out`
+
+### RWD 斷點
+- 桌機：1180px max-width
+- 平板：900px 下調整
+- 手機：640px 單欄
 
 ---
 
-請確認以上 spec，確認後我再開始建立 `index.html`。
+## 待你確認項目
+- ✅ 背景動畫：保持靜態漸層
+- ✅ Timeline 左側軸線：邊框 + glow 雙效果
+- ✅ Tag 雲邊框：清楚可讀（控制透明度）
+- ✅ Contact 連結：dummy 文字（不填實際連結）
+- ✅ Projects 卡片：不需要 GitHub/Demo 按鈕
+- ✅ 是否同意使用「王小明 / 中原大學資管系」作為假資料範例？
+- ✅ 玻璃卡片 hover 浮起效果需要「邊框+發光+陰影 glow」三重效果
+
+## 交付內容
+- `index.html`（只修改 `<style>` 區塊，嚴格遵守 CSS-Only 升級）
+- `spec.md`（此版本）
+
+---
+
+**下一步**：請確認以上 Apple Liquid Glass 設計規格已符合您的要求。確認後我會 **僅修改 `<style>` 區塊**，實現：
+1. 玻璃卡片 hover 浮起 + 邊框發光 + 陰影 glow（三重效果）
+2. Timeline 左側垂直軸線 + glow 內發光
+3. 標籤膠囊清楚可讀（控制透明度）
+4. 所有視覺細節符合 macOS Big Sur / iOS Control Center 質感
