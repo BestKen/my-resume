@@ -41,41 +41,73 @@
     .page-shell {
       max-width: 1180px;
       margin: 0 auto;
-      padding: 120px 24px 48px;
+      padding: 48px 24px 48px;
     }
 
     .toc {
-      position: fixed;
-      top: 16px;
-      left: 50%;
-      transform: translateX(-50%);
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
       z-index: 20;
-      width: min(98%, 980px);
       display: flex;
       justify-content: center;
       gap: 10px;
-      flex-wrap: wrap;
-      padding: 10px 18px;
-      background: rgba(10, 15, 28, 0.72);
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 12px 18px;
+      background: rgba(10, 15, 28, 0.8);
       border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 0;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(149, 214, 255, 0.2) transparent;
+    }
+
+    .toc::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .toc::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .toc::-webkit-scrollbar-thumb {
+      background: rgba(149, 214, 255, 0.2);
       border-radius: 999px;
-      backdrop-filter: blur(18px);
-      box-shadow: 0 24px 40px rgba(0,0,0,0.22);
+    }
+
+    .toc::-webkit-scrollbar-thumb:hover {
+      background: rgba(149, 214, 255, 0.4);
     }
 
     .toc a {
       color: var(--muted);
       text-decoration: none;
       font-size: 0.92rem;
-      padding: 10px 14px;
+      padding: 8px 16px;
       border-radius: 999px;
-      transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+      border: 1px solid transparent;
     }
 
     .toc a:hover {
-      background: rgba(149, 214, 255, 0.16);
+      background: rgba(149, 214, 255, 0.18);
       color: #ffffff;
+      border-color: rgba(149, 214, 255, 0.24);
       transform: translateY(-1px);
+    }
+
+    .toc a.active {
+      background: rgba(149, 214, 255, 0.24);
+      color: #ffffff;
+      border-color: rgba(149, 214, 255, 0.32);
+      box-shadow: inset 0 0 8px rgba(149, 214, 255, 0.08);
     }
 
     .section {
@@ -520,17 +552,16 @@
 
     @media (max-width: 640px) {
       .page-shell {
-        padding: 92px 16px 32px;
+        padding: 48px 16px 32px;
       }
 
       .toc {
-        left: 16px;
-        transform: none;
-        width: calc(100% - 32px);
+        padding: 10px 16px;
+        gap: 8px;
       }
 
       .toc a {
-        padding: 10px 12px;
+        padding: 8px 14px;
         font-size: 0.85rem;
       }
 
@@ -546,14 +577,13 @@
 </head>
 <body>
   <nav class="toc" aria-label="頁面導覽">
-    <a href="#hero">Hero</a>
-    <a href="#about">About</a>
-    <a href="#skills">Skills</a>
-    <a href="#education">Education</a>
-    <a href="#experience">Experience</a>
-    <a href="#awards">Awards</a>
-    <a href="#projects">Projects</a>
-    <a href="#contact">Contact</a>
+    <a href="#about">關於</a>
+    <a href="#skills">技能</a>
+    <a href="#education">學歷</a>
+    <a href="#experience">經歷</a>
+    <a href="#awards">獎項</a>
+    <a href="#projects">作品</a>
+    <a href="#contact">聯絡</a>
   </nav>
 
   <main class="page-shell">
@@ -852,5 +882,42 @@
       </div>
     </section>
   </main>
+  
+  <script>
+    // Active TOC link tracking
+    const observerOptions = {
+      root: null,
+      rootMargin: '-80px 0px -66% 0px',
+      threshold: 0
+    };
+
+    const tocLinks = document.querySelectorAll('.toc a');
+    const sections = document.querySelectorAll('section[id]');
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          tocLinks.forEach(link => link.classList.remove('active'));
+          const activeLink = document.querySelector(`.toc a[href="#${entry.target.id}"]`);
+          if (activeLink) activeLink.classList.add('active');
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach(section => observer.observe(section));
+
+    // Smooth scroll on click
+    tocLinks.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href').substring(1);
+        const targetSection = document.getElementById(targetId);
+        if (targetSection) {
+          targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          window.history.pushState(null, null, `#${targetId}`);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
